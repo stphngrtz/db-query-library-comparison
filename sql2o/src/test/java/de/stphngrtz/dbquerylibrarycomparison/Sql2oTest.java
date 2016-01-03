@@ -35,10 +35,10 @@ public class Sql2oTest {
                             "  FROM users")
                             .executeAndFetch(User.class),
                     containsInAnyOrder(
-                            new User(1L, "Stephan", "stephan.goertz@gmail.com"),
-                            new User(2L, "Steffi", "steffi05.04@freenet.de"),
-                            new User(3L, "Willi", "willi@web.de"),
-                            new User(4L, "Franz", "franz@web.de")
+                            new User(1, "Stephan", "stephan.goertz@gmail.com"),
+                            new User(2, "Steffi", "steffi05.04@freenet.de"),
+                            new User(3, "Willi", "willi@web.de"),
+                            new User(4, "Franz", "franz@web.de")
                     )
             );
         }
@@ -53,9 +53,9 @@ public class Sql2oTest {
                             " ORDER BY r.name DESC")
                             .executeAndFetch(Role.class),
                     contains(
-                            new Role(2L, "Developer"),
-                            new Role(3L, "Designer"),
-                            new Role(1L, "Admin")
+                            new Role(2, "Developer"),
+                            new Role(3, "Designer"),
+                            new Role(1, "Admin")
                     )
             );
         }
@@ -71,7 +71,7 @@ public class Sql2oTest {
                             .addParameter("id", 1)
                             .executeAndFetch(User.class),
                     contains(
-                            new User(1L, "Stephan", "stephan.goertz@gmail.com")
+                            new User(1, "Stephan", "stephan.goertz@gmail.com")
                     )
             );
         }
@@ -86,7 +86,7 @@ public class Sql2oTest {
                             " WHERE u.email LIKE '%@gmail.com'")
                             .executeAndFetch(User.class),
                     contains(
-                            new User(1L, "Stephan", "stephan.goertz@gmail.com")
+                            new User(1, "Stephan", "stephan.goertz@gmail.com")
                     )
             );
 
@@ -107,7 +107,7 @@ public class Sql2oTest {
                             .addParameter("id", 1)
                             .executeAndFetch(User.class),
                     contains(
-                            new User(1L, "Stephan", "mail@me.de")
+                            new User(1, "Stephan", "mail@me.de")
                     )
             );
         }
@@ -162,8 +162,8 @@ public class Sql2oTest {
                             .addParameter("id2", 2)
                             .executeAndFetch(User.class),
                     contains(
-                            new User(1L, "Stephan", null),
-                            new User(2L, "Steffi", null)
+                            new User(1, "Stephan", null),
+                            new User(2, "Steffi", null)
                     )
             );
         }
@@ -263,11 +263,11 @@ public class Sql2oTest {
     }
 
     private static class User {
-        public Long id;
+        public Integer id;
         public String name;
         public String email;
 
-        public User(Long id, String name, String email) {
+        public User(Integer id, String name, String email) {
             this.id = id;
             this.name = name;
             this.email = email;
@@ -299,10 +299,10 @@ public class Sql2oTest {
     }
 
     private static class Role {
-        public Long id;
+        public Integer id;
         public String name;
 
-        public Role(Long id, String name) {
+        public Role(Integer id, String name) {
             this.id = id;
             this.name = name;
         }
