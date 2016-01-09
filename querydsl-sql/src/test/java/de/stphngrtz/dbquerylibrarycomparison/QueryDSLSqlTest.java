@@ -15,6 +15,8 @@ import static org.hamcrest.Matchers.*;
 
 /**
  * http://www.querydsl.com/static/querydsl/latest/reference/html/ch02s03.html
+ *
+ * Disclaimer: Queries might look strange. This is because my goal was to test the functionality, not to write good queries ;)
  */
 public class QueryDSLSqlTest {
 

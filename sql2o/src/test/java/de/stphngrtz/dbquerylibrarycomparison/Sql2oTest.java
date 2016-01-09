@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
  * http://www.sql2o.org/docs/fetching-data/
+ *
+ * Disclaimer: Queries might look strange. This is because my goal was to test the functionality, not to write good queries ;)
  */
 public class Sql2oTest {
 
