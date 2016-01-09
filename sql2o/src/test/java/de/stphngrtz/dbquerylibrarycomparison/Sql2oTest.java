@@ -6,12 +6,13 @@ import org.sql2o.Connection;
 import org.sql2o.ResultSetHandler;
 import org.sql2o.Sql2o;
 
-import java.util.Objects;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
+/**
+ * http://www.sql2o.org/docs/fetching-data/
+ */
 public class Sql2oTest {
 
     private static final String db_url = "192.168.99.100";
@@ -259,74 +260,6 @@ public class Sql2oTest {
                             "Developer mit 2 Usern"
                     )
             );
-        }
-    }
-
-    private static class User {
-        public Integer id;
-        public String name;
-        public String email;
-
-        public User(Integer id, String name, String email) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            User user = (User) o;
-            return Objects.equals(id, user.id) &&
-                    Objects.equals(name, user.name) &&
-                    Objects.equals(email, user.email);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name, email);
-        }
-
-        @Override
-        public String toString() {
-            return "User{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", email='" + email + '\'' +
-                    '}';
-        }
-    }
-
-    private static class Role {
-        public Integer id;
-        public String name;
-
-        public Role(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Role role = (Role) o;
-            return Objects.equals(id, role.id) &&
-                    Objects.equals(name, role.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name);
-        }
-
-        @Override
-        public String toString() {
-            return "Role{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    '}';
         }
     }
 }

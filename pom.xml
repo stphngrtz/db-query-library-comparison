@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>common</module>
         <module>sql2o</module>
         <module>querydsl-sql</module>
     </modules>

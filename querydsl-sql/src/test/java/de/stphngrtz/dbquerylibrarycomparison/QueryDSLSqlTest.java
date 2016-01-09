@@ -1,21 +1,21 @@
 package de.stphngrtz.dbquerylibrarycomparison;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.sql.Configuration;
-import com.querydsl.sql.PostgreSQLTemplates;
-import com.querydsl.sql.SQLExpressions;
-import com.querydsl.sql.SQLQueryFactory;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.sql.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.postgresql.ds.PGPoolingDataSource;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.*;
 
+/**
+ * http://www.querydsl.com/static/querydsl/latest/reference/html/ch02s03.html
+ */
 public class QueryDSLSqlTest {
 
     private static final String db_url = "192.168.99.100";
@@ -30,6 +30,12 @@ public class QueryDSLSqlTest {
     public static void setUp() throws Exception {
         PostgreSQLTemplates templates = new PostgreSQLTemplates();
         Configuration configuration = new Configuration(templates);
+        configuration.addListener(new SQLBaseListener() {
+            @Override
+            public void preExecute(SQLListenerContext context) {
+                System.out.println(context.getSQL());
+            }
+        });
 
         PGPoolingDataSource pgPoolingDataSource = new PGPoolingDataSource();
         pgPoolingDataSource.setDataSourceName("A Data Source");
@@ -45,7 +51,7 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectAll() throws Exception {
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
                         .select(qUsers.all())
                         .from(qUsers)
@@ -62,7 +68,7 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectAllOrderedBy() throws Exception {
-        QRoles qRoles = new QRoles("roles");
+        QRoles qRoles = QRoles.roles;
         assertThat(queryFactory
                         .select(qRoles.all())
                         .from(qRoles)
@@ -79,7 +85,7 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWhereEquals() throws Exception {
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
                         .select(qUsers.all())
                         .from(qUsers)
@@ -94,7 +100,7 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWhereLike() throws Exception {
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
                         .select(qUsers.all())
                         .from(qUsers)
@@ -109,7 +115,7 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithConstant() throws Exception {
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
                         .select(qUsers.id, qUsers.name, Expressions.constant("mail@me.de"))
                         .from(qUsers)
@@ -124,8 +130,8 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithSubselectInSelectBlock() throws Exception {
-        QUsers qUsers = new QUsers("users");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
+        QUsers qUsers = QUsers.users;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qUsers.name, SQLExpressions.select(qUsersWithRoles.count()).from(qUsersWithRoles).where(qUsersWithRoles.userId.eq(qUsers.id)))
                         .from(qUsers)
@@ -142,8 +148,8 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithSubselectInWhereBlock() throws Exception {
-        QUsers qUsers = new QUsers("users");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
+        QUsers qUsers = QUsers.users;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qUsers.name)
                         .from(qUsers)
@@ -178,10 +184,9 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithImplicitJoin() throws Exception {
-        QUsers qUsers = new QUsers("users");
-        QRoles qRoles = new QRoles("roles");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
-
+        QUsers qUsers = QUsers.users;
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qUsers.name, qRoles.name)
                         .from(qUsers, qRoles, qUsersWithRoles)
@@ -202,10 +207,9 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithExplicitJoin() throws Exception {
-        QUsers qUsers = new QUsers("users");
-        QRoles qRoles = new QRoles("roles");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
-
+        QUsers qUsers = QUsers.users;
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qUsers.name, qRoles.name)
                         .from(qUsers)
@@ -224,10 +228,9 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectWithExplicitLeftOuterJoin() throws Exception {
-        QUsers qUsers = new QUsers("users");
-        QRoles qRoles = new QRoles("roles");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
-
+        QUsers qUsers = QUsers.users;
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qUsers.name, qRoles.name)
                         .from(qUsers)
@@ -247,8 +250,8 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectCountWithGroupBy() throws Exception {
-        QRoles qRoles = new QRoles("roles");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qRoles.name, qUsersWithRoles.count())
                         .from(qRoles)
@@ -266,8 +269,8 @@ public class QueryDSLSqlTest {
 
     @Test
     public void selectCountWithGroupByHaving() throws Exception {
-        QRoles qRoles = new QRoles("roles");
-        QUsersWithRoles qUsersWithRoles = new QUsersWithRoles("usersWithRoles");
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
         assertThat(queryFactory
                         .select(qRoles.name, qUsersWithRoles.count())
                         .from(qRoles)
@@ -285,9 +288,13 @@ public class QueryDSLSqlTest {
     @Test
     public void window() throws Exception {
         // siehe http://blog.jooq.org/2013/11/03/probably-the-coolest-sql-feature-window-functions/
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
-                        .select(qUsers.name, SQLExpressions.left(qUsers.name, 1), SQLExpressions.count().over().partitionBy(SQLExpressions.left(qUsers.name, 1)))
+                        .select(
+                                qUsers.name,
+                                SQLExpressions.left(qUsers.name, 1),
+                                SQLExpressions.count().over().partitionBy(SQLExpressions.left(qUsers.name, 1))
+                        )
                         .from(qUsers)
                         .orderBy(qUsers.name.asc())
                         .fetch()
@@ -304,9 +311,13 @@ public class QueryDSLSqlTest {
     @Test
     public void multipleWindows() throws Exception {
         // siehe http://blog.jooq.org/2013/11/03/probably-the-coolest-sql-feature-window-functions/
-        QUsers qUsers = new QUsers("users");
+        QUsers qUsers = QUsers.users;
         assertThat(queryFactory
-                        .select(SQLExpressions.lag(qUsers.name).over().orderBy(qUsers.name.asc()), qUsers.name, SQLExpressions.lead(qUsers.name).over().orderBy(qUsers.name.asc()))
+                        .select(
+                                SQLExpressions.lag(qUsers.name).over().orderBy(qUsers.name.asc()),
+                                qUsers.name,
+                                SQLExpressions.lead(qUsers.name).over().orderBy(qUsers.name.asc())
+                        )
                         .from(qUsers)
                         .orderBy(qUsers.name.asc())
                         .fetch()
@@ -320,74 +331,110 @@ public class QueryDSLSqlTest {
         );
     }
 
-    // TODO with-clause
-    // TODO common-module with User & Role
-
-    private static class User {
-        public Integer id;
-        public String name;
-        public String email;
-
-        public User(Integer id, String name, String email) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            User user = (User) o;
-            return Objects.equals(id, user.id) &&
-                    Objects.equals(name, user.name) &&
-                    Objects.equals(email, user.email);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name, email);
-        }
-
-        @Override
-        public String toString() {
-            return "User{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", email='" + email + '\'' +
-                    '}';
-        }
+    @Test
+    public void selectFromSimpleCommonTable() throws Exception {
+        QUsers qUsers = QUsers.users;
+        assertThat(queryFactory.query()
+                        .with(qUsers, SQLExpressions
+                                .select(qUsers.name, qUsers.email)
+                                .from(qUsers)
+                                .where(qUsers.name.startsWith("S"))
+                        )
+                        .select(qUsers.name, qUsers.email)
+                        .from(qUsers)
+                        .fetch()
+                        .stream().map(t -> t.get(qUsers.name) + " (" + t.get(qUsers.email) + ")").collect(Collectors.toList()),
+                containsInAnyOrder(
+                        "Stephan (stephan.goertz@gmail.com)",
+                        "Steffi (steffi05.04@freenet.de)"
+                )
+        );
     }
 
-    private static class Role {
-        public Integer id;
-        public String name;
+    @Test
+    public void selectFromMoreComplexCommonTable() throws Exception {
+        QUsers qUsers = QUsers.users;
+        QRoles qRoles = QRoles.roles;
+        QUsersWithRoles qUsersWithRoles = QUsersWithRoles.usersWithRoles;
+        PathBuilder<Tuple> common = new PathBuilder<>(Tuple.class, "common");
 
-        public Role(Integer id, String name) {
-            this.id = id;
-            this.name = name;
-        }
+        assertThat(queryFactory.query()
+                        .with(common, SQLExpressions
+                                .select(qUsers.name.as("userName"), qRoles.name.as("roleName"))
+                                .from(qUsers)
+                                .leftJoin(qUsersWithRoles).on(qUsersWithRoles.userId.eq(qUsers.id))
+                                .leftJoin(qRoles).on(qRoles.id.eq(qUsersWithRoles.roleId))
+                        )
+                        .select(common.get("userName"), common.get("roleName"))
+                        .from(common)
+                        .where(common.getString("userName").startsWith("S"))
+                        .fetch().stream().map(t -> t.get(common.getString("userName")) + " ist " + t.get(common.getString("roleName"))).collect(Collectors.toList()),
+                containsInAnyOrder(
+                        "Stephan ist Admin",
+                        "Stephan ist Developer",
+                        "Steffi ist Designer"
+                )
+        );
+    }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Role role = (Role) o;
-            return Objects.equals(id, role.id) &&
-                    Objects.equals(name, role.name);
-        }
+    @Test
+    public void dmlStatements() throws Exception {
+        QUsers qUsers = QUsers.users;
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name);
-        }
+        assertThat(queryFactory
+                        .insert(qUsers)
+                        .columns(qUsers.id, qUsers.name, qUsers.email)
+                        .values(5, "Test", "test@mail.de")
+                        .execute(),
+                equalTo(1L)
+        );
+        assertThat(queryFactory
+                        .update(qUsers)
+                        .set(qUsers.email, "test@web.de")
+                        .where(qUsers.id.eq(5))
+                        .execute(),
+                equalTo(1L)
+        );
+        assertThat(queryFactory
+                        .update(qUsers)
+                        .set(qUsers.name, "Testuser")
+                        .where(qUsers.email.eq("test@mail.de"))
+                        .execute(),
+                equalTo(0L)
+        );
+        assertThat(queryFactory
+                        .delete(qUsers)
+                        .where(qUsers.id.eq(5))
+                        .execute(),
+                equalTo(1L)
+        );
+    }
 
-        @Override
-        public String toString() {
-            return "Role{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    '}';
-        }
+    @Test
+    public void dmlBatchStatements() throws Exception {
+        QUsers qUsers = QUsers.users;
+
+        assertThat(queryFactory
+                        .insert(qUsers)
+                        .columns(qUsers.id, qUsers.name, qUsers.email)
+                        .values(5, "Test 1", "test1@mail.de").addBatch()
+                        .values(6, "Test 2", "test2@mail.de").addBatch()
+                        .execute(),
+                equalTo(2L)
+        );
+        assertThat(queryFactory
+                        .update(qUsers)
+                        .set(qUsers.name, "Testuser 1").where(qUsers.id.eq(5)).addBatch()
+                        .set(qUsers.name, "Testuser 2").where(qUsers.id.eq(6)).addBatch()
+                        .execute(),
+                equalTo(2L)
+        );
+        assertThat(queryFactory
+                        .delete(qUsers)
+                        .where(qUsers.id.eq(5)).addBatch()
+                        .where(qUsers.id.eq(6)).addBatch()
+                        .execute(),
+                equalTo(2L)
+        );
     }
 }
