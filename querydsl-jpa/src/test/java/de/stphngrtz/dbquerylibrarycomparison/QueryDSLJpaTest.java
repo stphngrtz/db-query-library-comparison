@@ -11,7 +11,6 @@ import org.junit.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -21,7 +20,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
  * http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html
- *
+ * <p>
  * Disclaimer: Queries might look strange. This is because my goal was to test the functionality, not to write good queries ;)
  */
 public class QueryDSLJpaTest {
@@ -51,8 +50,8 @@ public class QueryDSLJpaTest {
         QUserJPA qUserJPA = QUserJPA.userJPA;
 
         assertThat(queryFactory
-                .selectFrom(qUserJPA)
-                .fetch(),
+                        .selectFrom(qUserJPA)
+                        .fetch(),
                 containsInAnyOrder(
                         new UserJPA(1, "Stephan", "stephan.goertz@gmail.com"),
                         new UserJPA(2, "Steffi", "steffi05.04@freenet.de"),
