@@ -91,7 +91,7 @@
                             <name>org.jooq.util.postgres.PostgresDatabase</name>
                             <includes>.*</includes>
                             <excludes></excludes>
-                            <inputSchema>public</inputSchema>
+                            <inputSchema>hello_flyway</inputSchema>
                         </database>
                         <target>
                             <packageName>de.stphngrtz.dbquerylibrarycomparison</packageName>
